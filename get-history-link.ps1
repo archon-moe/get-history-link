@@ -108,12 +108,16 @@ function Select-Account($accounts) {
         Write-Host "       [$($i + 1)] " -ForegroundColor Cyan -NoNewline
         Write-Host "UID $($accounts[$i].Uid)"
     }
-    # Read-Host adds ": " after the prompt.
-    $choice = Read-Host "       Type the account number and press Enter (just Enter to skip)"
-    if ($choice -match '^\d+$' -and [int]$choice -ge 1 -and [int]$choice -le $accounts.Count) {
-        return $accounts[[int]$choice - 1]
+    # Asks again on a wrong number: rerunning would check every link again.
+    while ($true) {
+        # Read-Host adds ": " after the prompt.
+        $choice = "$(Read-Host "       Type the account number and press Enter (just Enter to skip)")".Trim()
+        if ($choice -eq "") { return $null }
+        if ($choice -match '^\d+$' -and [int]$choice -ge 1 -and [int]$choice -le $accounts.Count) {
+            return $accounts[[int]$choice - 1]
+        }
+        Write-Host "       There is no account $choice. Type a number from 1 to $($accounts.Count)." -ForegroundColor Yellow
     }
-    return $null
 }
 
 # --- Run --------------------------------------------------------------------
